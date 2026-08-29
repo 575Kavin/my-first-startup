@@ -1,4 +1,4 @@
-DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -18,9 +18,15 @@ DOCTYPE html>
         button:hover { background-color: #2b6cb0; }
         .copy-btn { background-color: #38a169; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 14px; margin-bottom: 15px; }
         .copy-btn:hover { background-color: #2f855a; }
+        .gmail-btn { background-color: #ea4335; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 14px; margin-bottom: 15px; }
+        .gmail-btn:hover { background-color: #d93025; }
         .output-box { padding: 15px; background: #f8fafc; border-left: 4px solid #3182ce; border-radius: 4px; font-size: 14px; white-space: pre-wrap; word-wrap: break-word; margin-bottom: 15px; }
         .score-badge { display: inline-block; padding: 4px 8px; background: #e2e8f0; border-radius: 4px; font-weight: bold; margin-bottom: 10px; }
+        .footer-note { text-align: center; font-size: 12px; color: #a0aec0; margin-top: 30px; border-top: 1px dashed #e2e8f0; padding-top: 15px; }
     </style>
+    
+    <!-- FREE TRACKING SCRIPT ENGINE (GoatCounter) -->
+    <script data-goatcounter="https://goatcounter.com" async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
 
@@ -34,6 +40,7 @@ DOCTYPE html>
             <input type="text" id="emailInput" placeholder="Type your email subject line here...">
             <button onclick="checkEmailSubject()">Grade Title</button>
             <div id="emailOutput" class="output-box" style="display:none;"></div>
+            <button id="gmailButton" class="gmail-btn" onclick="openRealGmail()" style="display:none;">✉️ Open & Compose in Real Gmail</button>
         </div>
 
         <!-- TOOL 2: LINKEDIN TEXT FORMATTER -->
@@ -45,21 +52,35 @@ DOCTYPE html>
             <button id="copyButton" class="copy-btn" onclick="copyToClipboard()" style="display:none;">📋 Copy Formatted Text</button>
         </div>
     </div>
+    
+    <div class="footer-note">📊 Protected Startup Asset • Real-Time Traffic Tracked Safely</div>
 </div>
 
 <script>
 let globalFormattedText = "";
+let currentSubject = "";
+
+// Helper function to send event logs to your tracking dashboard safely
+function logEvent(name) {
+    if (window.goatcounter && window.goatcounter.count) {
+        window.goatcounter.count({ path: name, title: name, event: true });
+    }
+}
 
 function checkEmailSubject() {
     let subject = document.getElementById('emailInput').value.trim();
     let outputDiv = document.getElementById('emailOutput');
+    let gmailBtn = document.getElementById('gmailButton');
     
     if (subject.length === 0) {
         outputDiv.style.display = "block";
         outputDiv.innerHTML = "⚠️ Please type a subject line first.";
+        gmailBtn.style.display = "none";
         return;
     }
     
+    logEvent('click-email-grader'); // TRACKS THIS BUTTON CLICK
+    currentSubject = subject; 
     let score = 100;
     let feedback = [];
     
@@ -75,6 +96,15 @@ function checkEmailSubject() {
     
     outputDiv.style.display = "block";
     outputDiv.innerHTML = `<span class="score-badge">Score: ${Math.max(0, score)}/100</span><br>` + feedback.join('<br>');
+    gmailBtn.style.display = "block";
+}
+
+function openRealGmail() {
+    logEvent('click-open-gmail'); // TRACKS GMAIL EXPORTS
+    let encodedSubject = encodeURIComponent(currentSubject);
+    let encodedBody = encodeURIComponent("Hi team,\n\nI wanted to reach out regarding our discussion.\n\nBest regards,\n[Your Name]");
+    let gmailUrl = `https://google.com{encodedSubject}&body=${encodedBody}`;
+    window.open(gmailUrl, '_blank');
 }
 
 function formatLinkedIn() {
@@ -89,11 +119,10 @@ function formatLinkedIn() {
         return;
     }
     
-    // Double spacing logic
+    logEvent('click-linkedin-formatter'); // TRACKS LINKEDIN BUTTON FORMATS
     let lines = text.split('\n');
     for (let i = 0; i < lines.length; i++) {
         let trimmed = lines[i].trim();
-        // Ultimate rule: if a line starts with a hyphen, swap it out with a rocket emoji!
         if (trimmed.startsWith('-')) {
             lines[i] = '🚀 ' + trimmed.substring(1).trim();
         }
@@ -104,12 +133,12 @@ function formatLinkedIn() {
     
     outputDiv.style.display = "block";
     outputDiv.innerHTML = `<strong>✨ Formatted Copy (Ready to Paste):</strong>\n\n` + formatted;
-    
     copyBtn.style.display = "block";
     copyBtn.innerText = "📋 Copy Formatted Text";
 }
 
 function copyToClipboard() {
+    logEvent('click-copy-clipboard'); // TRACKS CLIPBOARD COPIES
     navigator.clipboard.writeText(globalFormattedText).then(() => {
         let copyBtn = document.getElementById('copyButton');
         copyBtn.innerText = "✅ Copied Successfully!";
