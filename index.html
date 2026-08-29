@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -16,7 +16,9 @@
         textarea { height: 150px; resize: none; }
         button { background-color: #3182ce; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 14px; margin-bottom: 15px; }
         button:hover { background-color: #2b6cb0; }
-        .output-box { padding: 15px; background: #f8fafc; border-left: 4px solid #3182ce; border-radius: 4px; font-size: 14px; white-space: pre-wrap; word-wrap: break-word; }
+        .copy-btn { background-color: #38a169; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 14px; margin-bottom: 15px; }
+        .copy-btn:hover { background-color: #2f855a; }
+        .output-box { padding: 15px; background: #f8fafc; border-left: 4px solid #3182ce; border-radius: 4px; font-size: 14px; white-space: pre-wrap; word-wrap: break-word; margin-bottom: 15px; }
         .score-badge { display: inline-block; padding: 4px 8px; background: #e2e8f0; border-radius: 4px; font-weight: bold; margin-bottom: 10px; }
     </style>
 </head>
@@ -40,11 +42,14 @@
             <textarea id="linkedinInput" placeholder="Paste your messy LinkedIn draft here... Use hyphens (-) at the start of a line to make lists."></textarea>
             <button onclick="formatLinkedIn()">Format & Clean Text</button>
             <div id="linkedinOutput" class="output-box" style="display:none;"></div>
+            <button id="copyButton" class="copy-btn" onclick="copyToClipboard()" style="display:none;">📋 Copy Formatted Text</button>
         </div>
     </div>
 </div>
 
 <script>
+let globalFormattedText = "";
+
 function checkEmailSubject() {
     let subject = document.getElementById('emailInput').value.trim();
     let outputDiv = document.getElementById('emailOutput');
@@ -75,21 +80,42 @@ function checkEmailSubject() {
 function formatLinkedIn() {
     let text = document.getElementById('linkedinInput').value;
     let outputDiv = document.getElementById('linkedinOutput');
+    let copyBtn = document.getElementById('copyButton');
     
     if (text.trim().length === 0) {
         outputDiv.style.display = "block";
         outputDiv.innerHTML = "⚠️ Please paste some text first.";
+        copyBtn.style.display = "none";
         return;
     }
     
-    // Step A: Standardize single line breaks into clean paragraph gaps
-    let formatted = text.trim().replace(/\n/g, '\n\n');
+    // Double spacing logic
+    let lines = text.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+        let trimmed = lines[i].trim();
+        // Ultimate rule: if a line starts with a hyphen, swap it out with a rocket emoji!
+        if (trimmed.startsWith('-')) {
+            lines[i] = '🚀 ' + trimmed.substring(1).trim();
+        }
+    }
     
-    // Step B: Find hyphens at the start of lines and exchange them for rockets
-    formatted = formatted.replace(/^- /gm, '🚀 ');
+    let formatted = lines.join('\n\n');
+    globalFormattedText = formatted;
     
     outputDiv.style.display = "block";
     outputDiv.innerHTML = `<strong>✨ Formatted Copy (Ready to Paste):</strong>\n\n` + formatted;
+    
+    copyBtn.style.display = "block";
+    copyBtn.innerText = "📋 Copy Formatted Text";
+}
+
+function copyToClipboard() {
+    navigator.clipboard.writeText(globalFormattedText).then(() => {
+        let copyBtn = document.getElementById('copyButton');
+        copyBtn.innerText = "✅ Copied Successfully!";
+    }).catch(err => {
+        alert("Failed to copy text automatically.");
+    });
 }
 </script>
 
