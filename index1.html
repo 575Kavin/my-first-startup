@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creator & Outreach Toolkit</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f7fafc; margin: 0; padding: 40px; color: #2d3748; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        h1 { text-align: center; color: #1a365d; margin-bottom: 30px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } .body { padding: 15px; } }
+        .card { border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; background: #fff; display: flex; flex-direction: column; }
+        h2 { color: #2b6cb0; font-size: 1.2rem; margin-top: 0; }
+        textarea, input[type="text"] { width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 6px; box-sizing: border-box; margin-bottom: 15px; font-size: 14px; }
+        textarea { height: 150px; resize: none; }
+        button { background-color: #3182ce; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 14px; margin-bottom: 15px; }
+        button:hover { background-color: #2b6cb0; }
+        .output-box { padding: 15px; background: #f8fafc; border-left: 4px solid #3182ce; border-radius: 4px; font-size: 14px; white-space: pre-wrap; word-wrap: break-word; }
+        .score-badge { display: inline-block; padding: 4px 8px; background: #e2e8f0; border-radius: 4px; font-weight: bold; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🚀 Free Creator & Outreach Toolkit</h1>
+    
+    <div class="grid">
+        <!-- TOOL 1: EMAIL SUBJECT GRADER -->
+        <div class="card">
+            <h2>📧 Email Subject Grader</h2>
+            <input type="text" id="emailInput" placeholder="Type your email subject line here...">
+            <button onclick="checkEmailSubject()">Grade Title</button>
+            <div id="emailOutput" class="output-box" style="display:none;"></div>
+        </div>
+
+        <!-- TOOL 2: LINKEDIN TEXT FORMATTER -->
+        <div class="card">
+            <h2>📝 LinkedIn Smart Formatter</h2>
+            <textarea id="linkedinInput" placeholder="Paste your messy LinkedIn draft here... Use hyphens (-) at the start of a line to make lists."></textarea>
+            <button onclick="formatLinkedIn()">Format & Clean Text</button>
+            <div id="linkedinOutput" class="output-box" style="display:none;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+function checkEmailSubject() {
+    let subject = document.getElementById('emailInput').value.trim();
+    let outputDiv = document.getElementById('emailOutput');
+    
+    if (subject.length === 0) {
+        outputDiv.style.display = "block";
+        outputDiv.innerHTML = "⚠️ Please type a subject line first.";
+        return;
+    }
+    
+    let score = 100;
+    let feedback = [];
+    
+    if (subject.length > 60) { score -= 20; feedback.push("• Too long! It will get cut off on mobile screens."); }
+    if (subject.length < 20) { score -= 10; feedback.push("• Too short! Add a little more detail."); }
+    
+    const spamWords = ["free", "urgent", "help", "reminder", "click"];
+    spamWords.forEach(word => {
+        if (subject.toLowerCase().includes(word)) { score -= 15; feedback.push(`• Remove high-risk word: "${word}"`); }
+    });
+    
+    if (score === 100) feedback.push("• Looks fantastic! Ready to send.");
+    
+    outputDiv.style.display = "block";
+    outputDiv.innerHTML = `<span class="score-badge">Score: ${Math.max(0, score)}/100</span><br>` + feedback.join('<br>');
+}
+
+function formatLinkedIn() {
+    let text = document.getElementById('linkedinInput').value;
+    let outputDiv = document.getElementById('linkedinOutput');
+    
+    if (text.trim().length === 0) {
+        outputDiv.style.display = "block";
+        outputDiv.innerHTML = "⚠️ Please paste some text first.";
+        return;
+    }
+    
+    // Step A: Standardize single line breaks into clean paragraph gaps
+    let formatted = text.trim().replace(/\n/g, '\n\n');
+    
+    // Step B: Find hyphens at the start of lines and exchange them for rockets
+    formatted = formatted.replace(/^- /gm, '🚀 ');
+    
+    outputDiv.style.display = "block";
+    outputDiv.innerHTML = `<strong>✨ Formatted Copy (Ready to Paste):</strong>\n\n` + formatted;
+}
+</script>
+
+</body>
+</html>
